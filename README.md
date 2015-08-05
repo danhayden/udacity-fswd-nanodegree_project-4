@@ -24,6 +24,43 @@ App Engine application for the Udacity Nanodegree: Full Stack Developer (Project
 1. (Optional) Generate your client library(ies) with [the endpoints tool][6].
 1. Deploy your application.
 
+## Tasks
+
+### Task 1: Add Sessions to a Conference
+
+#### Define the following Endpoints methods
+
+- `getConferenceSessions(websafeConferenceKey)`
+   Given a conference, return all sessions
+
+- `getConferenceSessionsByType(websafeConferenceKey, typeOfSession)`
+   Given a conference, return all sessions of a specified type (eg lecture, keynote, workshop)
+
+- `getSessionsBySpeaker(speaker)`
+   Given a speaker, return all sessions given by this particular speaker, across all conferences
+
+- `createSession(SessionForm, websafeConferenceKey)`
+   Open only to the organizer of the conference
+
+#### Define Session class and SessionForm
+
+In the SessionForm pass in:
+- name
+- highlights
+- speaker
+- duration
+- typeOfSession
+- date
+- start time (in 24 hour notation so it can be ordered)
+
+#### Explain your design choices
+
+The Sessions implementation is based heavy on the existing Conference
+implementation due to their similar functionality and related purpose.
+
+For the sake of simplicity speaker is defined as a StringProperty to avoid the
+need create a separate speaker entity.
+
 
 [1]: https://developers.google.com/appengine
 [2]: http://python.org
