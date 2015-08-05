@@ -72,6 +72,15 @@ need create a separate speaker entity.
    query for all the sessions in a conference that the user is interested in
 
 
+### Task 4: Add a Task
+
+#### Define the following Endpoints method
+
+- `getFeaturedSpeaker()`
+   When a new session is added to a conference if there is more than one session
+   by this speaker return featured speaker / sessions from memcache.
+
+
 [1]: https://developers.google.com/appengine
 [2]: http://python.org
 [3]: https://developers.google.com/appengine/docs/python/endpoints/

@@ -55,6 +55,9 @@ API_EXPLORER_CLIENT_ID = endpoints.API_EXPLORER_CLIENT_ID
 MEMCACHE_ANNOUNCEMENTS_KEY = "RECENT_ANNOUNCEMENTS"
 ANNOUNCEMENT_TPL = ('Last chance to attend! The following conferences '
                     'are nearly sold out: %s')
+MEMCACHE_FEATURED_KEY = "FEATURED_SESSIONS"
+FEATURED_TPL = "{}'s featured sessions: {}"
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 DEFAULTS = {
@@ -650,9 +653,14 @@ class ConferenceApi(remote.Service):
         s_key = ndb.Key(Session, s_id, parent=conference_key)
         data['key'] = s_key
 
-        # create Session & return (modified) SessionForm
-        Session(**data).put()
+        # create Session
+        session = Session(**data)
+        session.put()
 
+        # update featured sessions
+        self._cacheFeaturedSessions(session)
+
+        # return (modified) SessionForm
         return request
 
 
@@ -698,6 +706,33 @@ class ConferenceApi(remote.Service):
         if getattr(request, 'speaker'):
             sessions = Session.query().filter(Session.speaker == request.speaker)
         return SessionForms(items=[self._copySessionToForm(session) for session in sessions])
+
+# - - - Featured Sessions - - - - - - - - - - - - - - - - - - - -
+
+    @staticmethod
+    def _cacheFeaturedSessions():
+        """When a new session is added to a conference, check the speaker."""
+        sessions = Session.query(Session.speaker == session.speaker).fetch()
+
+        if len(sessions) > 1:
+            # If there is more than one session by this speaker at this conference,
+            # add a new Memcache entry that features the speaker and session names.
+            featured = FEATURED_TPL.format(session.speaker, ','.join([session.name for session in sessions]))
+            memcache.set(MEMCACHE_FEATURED_KEY, featured)
+        else:
+            featured = ""
+            memcache.delete(MEMCACHE_FEATURED_KEY)
+
+        return featured
+
+
+    @endpoints.method(message_types.VoidMessage, StringMessage,
+                      path='session/featured/get',
+                      http_method='GET',
+                      name='getFeaturedSpeaker')
+    def getFeaturedSpeaker(self, request):
+        """Return Featured speaker / sessions from memcache."""
+        return StringMessage(data=memcache.get(MEMCACHE_FEATURED_KEY) or "")
 
 # - - - Wishlist - - - - - - - - - - - - - - - - -
 
