@@ -61,6 +61,16 @@ implementation due to their similar functionality and related purpose.
 For the sake of simplicity speaker is defined as a StringProperty to avoid the
 need create a separate speaker entity.
 
+### Task 2: Add Sessions to User Wishlist
+
+#### Define the following Endpoints methods
+
+- `addSessionToWishlist(SessionKey)`
+   adds the session to the user's list of sessions they are interested in attending
+
+- `getSessionsInWishlist()`
+   query for all the sessions in a conference that the user is interested in
+
 
 [1]: https://developers.google.com/appengine
 [2]: http://python.org

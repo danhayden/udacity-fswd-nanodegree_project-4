@@ -39,6 +39,9 @@ from models import TeeShirtSize
 from models import Session
 from models import SessionForm
 from models import SessionForms
+from models import WishlistSession
+from models import WishlistSessionForm
+from models import WishlistSessionForms
 
 from settings import WEB_CLIENT_ID
 from settings import ANDROID_CLIENT_ID
@@ -103,6 +106,15 @@ SESSION_GET_REQUEST = endpoints.ResourceContainer(
 
 SESSION_POST_REQUEST = endpoints.ResourceContainer(
     SessionForm,
+    websafeConferenceKey=messages.StringField(1),
+)
+
+WISHLIST_POST_REQUEST = endpoints.ResourceContainer(
+    websafeSessionKey=messages.StringField(1, required=True),
+)
+
+WISHLIST_GET_REQUEST = endpoints.ResourceContainer(
+    message_types.VoidMessage,
     websafeConferenceKey=messages.StringField(1),
 )
 
@@ -685,6 +697,73 @@ class ConferenceApi(remote.Service):
         sessions = []
         if getattr(request, 'speaker'):
             sessions = Session.query().filter(Session.speaker == request.speaker)
+        return SessionForms(items=[self._copySessionToForm(session) for session in sessions])
+
+# - - - Wishlist - - - - - - - - - - - - - - - - -
+
+    def _copyWishlistSessionToForm(self, wishlist_session):
+        """Copy relevant fields from Session to SessionForm."""
+        wlsf = WishlistSessionForm()
+        for field in wlsf.all_fields():
+            if hasattr(wishlist_session, field.name):
+                # convert Date to date string; just copy others
+                if field.name.endswith('Date'):
+                    setattr(wlsf, field.name, str(getattr(wishlist_session, field.name)))
+                else:
+                    setattr(wlsf, field.name, getattr(wishlist_session, field.name))
+            elif field.name == "websafeKey":
+                setattr(wlsf, field.name, wishlist_session.key.urlsafe())
+        wlsf.check_initialized()
+        return wlsf
+
+
+    @endpoints.method(WISHLIST_POST_REQUEST, WishlistSessionForm,
+                      path='wishlist',
+                      http_method='POST',
+                      name='addSessionToWishlist')
+    def addSessionToWishlist(self, request):
+        """adds the session to the user's list of sessions they are interested in attending"""
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+        user_id = getUserId(user)
+
+        s_key = ndb.Key(urlsafe=request.websafeSessionKey)
+        if not s_key:
+            raise endpoints.BadRequestException('Session key not found')
+
+        w_key = ndb.Key(WishlistSession, request.websafeSessionKey)
+        wishlist_session = w_key.get()
+        if wishlist_session:
+            raise endpoints.BadRequestException('Session already added')
+
+        wishlist_session = WishlistSession(key=w_key,
+                                           sessionConferenceKey=s_key.parent().urlsafe(),
+                                           sessionKey=s_key.urlsafe(),
+                                           userId=user_id)
+        wishlist_session.put()
+
+        return self._copyWishlistSessionToForm(wishlist_session)
+
+
+    @endpoints.method(WISHLIST_GET_REQUEST, SessionForms,
+                      path='wishlist',
+                      http_method='GET',
+                      name='getSessionsInWishlist')
+    def getSessionsInWishlist(self, request):
+        """query for all the sessions in a conference that the user is interested in"""
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+        user_id = getUserId(user)
+
+        wl_sessions = WishlistSession.query(WishlistSession.userId == user_id)
+        if hasattr(request, 'websafeConferenceKey'):
+            if request.websafeConferenceKey:
+                wl_sessions = wl_sessions.filter(WishlistSession.sessionConferenceKey == request.websafeConferenceKey)
+
+        sessions = ndb.get_multi([ndb.Key(urlsafe=w.sessionKey) for wl in wl_sessions])
+
         return SessionForms(items=[self._copySessionToForm(session) for session in sessions])
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -132,3 +132,22 @@ class SessionForm(messages.Message):
 class SessionForms(messages.Message):
     """SessionForms -- multiple Session outbound form message"""
     items = messages.MessageField(SessionForm, 1, repeated=True)
+
+class WishlistSession(ndb.Model):
+    """WishlistSession - conference session wishlist object"""
+    sessionConferenceKey = ndb.StringProperty(required=True)
+    sessionKey = ndb.StringProperty(required=True)
+    userId = ndb.StringProperty()
+    addDate = ndb.DateTimeProperty(auto_now_add=True)
+
+class WishlistSessionForm(messages.Message):
+    """WishlistSessionForm -- WishlistSession outbound form message"""
+    sessionConferenceKey = messages.StringField(1)
+    sessionKey = messages.StringField(2)
+    userId = messages.StringField(3)
+    addDate = messages.StringField(4)
+    websafeKey = messages.StringField(5)
+
+class WishlistSessionForms(messages.Message):
+    """WishlistSessionForms -- multiple WishlistSession outbound form message"""
+    items = messages.MessageField(WishlistSessionForm, 1, repeated=True)
