@@ -1,4 +1,4 @@
-App Engine application for the Udacity training course.
+App Engine application for the Udacity Nanodegree: Full Stack Developer (Project 4)
 
 ## Products
 - [App Engine][1]
@@ -8,6 +8,7 @@ App Engine application for the Udacity training course.
 
 ## APIs
 - [Google Cloud Endpoints][3]
+- [API Explorer][7]
 
 ## Setup Instructions
 1. Update the value of `application` in `app.yaml` to the app ID you
@@ -30,3 +31,4 @@ App Engine application for the Udacity training course.
 [4]: https://console.developers.google.com/
 [5]: https://localhost:8080/
 [6]: https://developers.google.com/appengine/docs/python/endpoints/endpoints_tool
+[7]: https://apis-explorer.appspot.com/apis-explorer/?base=https://udacity--conference-central.appspot.com/_ah/api#p/
