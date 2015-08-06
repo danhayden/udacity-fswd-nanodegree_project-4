@@ -26,9 +26,9 @@ App Engine application for the Udacity Nanodegree: Full Stack Developer (Project
 
 ## Tasks
 
-### Task 1: Add Sessions to a Conference
+## Task 1: Add Sessions to a Conference
 
-#### Define the following Endpoints methods
+### Define the following Endpoints methods
 
 - `getConferenceSessions(websafeConferenceKey)`
    Given a conference, return all sessions
@@ -42,7 +42,7 @@ App Engine application for the Udacity Nanodegree: Full Stack Developer (Project
 - `createSession(SessionForm, websafeConferenceKey)`
    Open only to the organizer of the conference
 
-#### Define Session class and SessionForm
+### Define Session class and SessionForm
 
 In the SessionForm pass in:
 - name
@@ -53,7 +53,7 @@ In the SessionForm pass in:
 - date
 - start time (in 24 hour notation so it can be ordered)
 
-#### Explain your design choices
+### Explain your design choices
 
 The Sessions implementation is based heavy on the existing Conference
 implementation due to their similar functionality and related purpose.
@@ -61,9 +61,9 @@ implementation due to their similar functionality and related purpose.
 For the sake of simplicity speaker is defined as a StringProperty to avoid the
 need create a separate speaker entity.
 
-### Task 2: Add Sessions to User Wishlist
+## Task 2: Add Sessions to User Wishlist
 
-#### Define the following Endpoints methods
+### Define the following Endpoints methods
 
 - `addSessionToWishlist(SessionKey)`
    adds the session to the user's list of sessions they are interested in attending
@@ -72,9 +72,9 @@ need create a separate speaker entity.
    query for all the sessions in a conference that the user is interested in
 
 
-### Task 4: Add a Task
+## Task 4: Add a Task
 
-#### Define the following Endpoints method
+### Define the following Endpoints method
 
 - `getFeaturedSpeaker()`
    When a new session is added to a conference if there is more than one session
