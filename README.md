@@ -71,6 +71,68 @@ need create a separate speaker entity.
 - `getSessionsInWishlist()`
    query for all the sessions in a conference that the user is interested in
 
+## Task 3: Work on indexes and queries
+
+### Part 2: Solve the following query related problem
+
+> Let’s say that you don't like workshops and you don't like sessions after 7 pm.
+> How would you handle a query for all non-workshop sessions before 7 pm?
+
+#### What is the problem for implementing this query?
+
+An inequality filter can be applied to at most one property. The problem here
+would require an inequality filter on two:
+
+- typeOfSession not equal to workshop
+- startTime less than 7 pm
+
+#### What ways to solve it did you think of?
+
+#### Option 1
+
+1. First query with the inequality filter that would return the smallest amount of
+   sessions. An educated guess would be that there are more sessions with
+   typeOfSession that is workshop than there are sessions that start 7pm or later.
+
+2. Create an empty session list then iterate through the 'non_workshop_sessions'
+   and append all sessions that start before 7pm to the new list.
+
+
+```py
+time_filter = datetime.strptime("19:00", "%H:%M").time()
+
+non_workshop_sessions = Session.query(Session.typeOfSession != 'WORKSHOP')
+
+sessions = []
+for session in non_workshop_sessions:
+    if session.typeOfSession < time_filter:
+        sessions.append(session)
+
+return sessions
+```
+
+#### Option 2
+
+Alternatively if you know all types of session you could also avoid the
+inequality filter on typeOfSession using ndb in as below:
+
+```py
+type_filter = ['DEFAULT', 'KEYNOTE', 'LECTURE']  # all types that are not workshop
+time_filter = datetime.strptime("19:00", "%H:%M").time()
+
+sessions = Session.query(ndb.AND(Session.typeOfSession.IN(type_filter),
+                                 Session.startTime < time_filter))
+
+return sessions
+```
+
+#### Additional Notes
+
+For a truly accurate solution checking the session startTime alone would be insufficient
+as we should consider the duration too. i.e a session could start at 6pm and run
+for two hours taking the session over the 7pm limit.
+Therefore the statement would be more accurately represented as shown in the below pseudo code:
+`Session.startTime + Session.duration < time_filter`
 
 ## Task 4: Add a Task
 
