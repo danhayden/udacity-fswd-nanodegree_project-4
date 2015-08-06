@@ -803,4 +803,32 @@ class ConferenceApi(remote.Service):
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    @endpoints.method(message_types.VoidMessage,
+                      SessionForms,
+                      http_method='GET',
+                      name='getShortSessions')
+    def getShortSessions(self, request):
+        """Return all sessions that are under one hour"""
+
+        sessions = Session.query(ndb.AND(Session.duration > 0, Session.duration < 60))
+        # assuming duration is specified in minutes
+
+        return SessionForms(items=[self._copySessionToForm(session) for session in sessions])
+
+
+    @endpoints.method(message_types.VoidMessage,
+                      SessionForms,
+                      http_method='GET',
+                      name='getIncompleteSessions')
+    def getIncompleteSessions(self, request):
+        """Return all sessions with default information for speaker, duration, or type"""
+
+        sessions = Session.query(ndb.OR(Session.speaker == "Default",
+                                        Session.duration == 0,
+                                        Session.typeOfSession == "Default"))
+
+        return SessionForms(items=[self._copySessionToForm(session) for session in sessions])
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 api = endpoints.api_server([ConferenceApi]) # register API

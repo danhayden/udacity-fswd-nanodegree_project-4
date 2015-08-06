@@ -73,6 +73,48 @@ need create a separate speaker entity.
 
 ## Task 3: Work on indexes and queries
 
+### Part 1: Come up with 2 additional queries
+
+Think about other types of queries that would be useful for this application.
+Describe the purpose of 2 new queries and write the code that would perform them.
+
+Note: The following two endpoints can be assessed from the [API Explorer][7]
+
+#### query 1
+
+Get session that are less than 1 hour long.
+This maybe useful for people only interested in short sessions.
+
+```py
+@endpoints.method(message_types.VoidMessage, SessionForms,
+                  http_method='GET', name='getShortSessions')
+def getShortSessions(self, request):
+    """Return all sessions that are under one hour"""
+
+    sessions = Session.query(ndb.AND(Session.duration > 0, Session.duration < 60))
+    # assuming duration is specified in minutes
+
+    return SessionForms(items=[self._copySessionToForm(session) for session in sessions])
+```
+
+#### query 2
+
+Get all sessions with default information for speaker, duration, or type.
+This maybe useful for find sessions that need further info added.
+
+```py
+@endpoints.method(message_types.VoidMessage, SessionForms,
+                  http_method='GET', name='getIncompleteSessions')
+def getIncompleteSessions(self, request):
+    """Return all sessions with default information for speaker, duration, or type"""
+
+    sessions = Session.query(ndb.OR(Session.speaker == "Default",
+                                    Session.duration == 0,
+                                    Session.typeOfSession == "Default"))
+
+    return SessionForms(items=[self._copySessionToForm(session) for session in sessions])
+```
+
 ### Part 2: Solve the following query related problem
 
 > Let’s say that you don't like workshops and you don't like sessions after 7 pm.
