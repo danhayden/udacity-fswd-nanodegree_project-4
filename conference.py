@@ -661,7 +661,7 @@ class ConferenceApi(remote.Service):
         session.put()
 
         # update featured sessions
-        self._cacheFeaturedSessions(session)
+        self._cacheFeaturedSpeaker(session)
 
         # return (modified) SessionForm
         return request
@@ -710,10 +710,10 @@ class ConferenceApi(remote.Service):
             sessions = Session.query().filter(Session.speaker == request.speaker)
         return SessionForms(items=[self._copySessionToForm(session) for session in sessions])
 
-# - - - Featured Sessions - - - - - - - - - - - - - - - - - - - -
+# - - - Featured Speaker - - - - - - - - - - - - - - - - - - - -
 
     @staticmethod
-    def _cacheFeaturedSessions(session):
+    def _cacheFeaturedSpeaker(session):
         """When a new session is added to a conference, check the speaker."""
         sessions = Session.query(Session.speaker == session.speaker).fetch()
 
