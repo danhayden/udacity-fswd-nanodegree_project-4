@@ -159,7 +159,7 @@ Alternatively if you know all types of session you could also avoid the
 inequality filter on typeOfSession using ndb in as below:
 
 ```py
-type_filter = ['DEFAULT', 'KEYNOTE', 'LECTURE']  # all types that are not workshop
+type_filter = ['NOT_SPECIFIED', 'KEYNOTE', 'LECTURE']  # all types that are not workshop
 time_filter = datetime.strptime("19:00", "%H:%M").time()
 
 sessions = Session.query(ndb.AND(Session.typeOfSession.IN(type_filter),
