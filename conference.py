@@ -725,6 +725,8 @@ class ConferenceApi(remote.Service):
         else:
             featured = ""
             memcache.delete(MEMCACHE_FEATURED_KEY)
+                    
+        taskqueue.add(params={'speaker': data['speaker']}, url='/tasks/set_featured_speaker')
 
         return featured
 
