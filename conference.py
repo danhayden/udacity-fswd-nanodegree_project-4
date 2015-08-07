@@ -710,7 +710,7 @@ class ConferenceApi(remote.Service):
 # - - - Featured Sessions - - - - - - - - - - - - - - - - - - - -
 
     @staticmethod
-    def _cacheFeaturedSessions():
+    def _cacheFeaturedSessions(session):
         """When a new session is added to a conference, check the speaker."""
         sessions = Session.query(Session.speaker == session.speaker).fetch()
 
