@@ -661,7 +661,13 @@ class ConferenceApi(remote.Service):
         session.put()
 
         # update featured sessions
-        self._cacheFeaturedSpeaker(session)
+        sessions = Session.query(Session.speaker == session.speaker).fetch()
+        if len(sessions) > 1:
+            # If there is more than one session by this speaker at this conference,
+            # add a new Memcache entry that features the speaker and session names.
+            featured = FEATURED_TPL.format(session.speaker, ','.join([session.name for session in sessions]))
+            taskqueue.add(params={'speaker': featured}, url='/tasks/set_featured_speaker')
+            memcache.set(MEMCACHE_FEATURED_KEY, featured)
 
         # return (modified) SessionForm
         return request
@@ -713,20 +719,11 @@ class ConferenceApi(remote.Service):
 # - - - Featured Speaker - - - - - - - - - - - - - - - - - - - -
 
     @staticmethod
-    def _cacheFeaturedSpeaker(session):
+    def _cacheFeaturedSpeaker(speaker):
         """When a new session is added to a conference, check the speaker."""
-        sessions = Session.query(Session.speaker == session.speaker).fetch()
-
-        if len(sessions) > 1:
-            # If there is more than one session by this speaker at this conference,
-            # add a new Memcache entry that features the speaker and session names.
-            featured = FEATURED_TPL.format(session.speaker, ','.join([session.name for session in sessions]))
-            memcache.set(MEMCACHE_FEATURED_KEY, featured)
-        else:
-            featured = ""
-            memcache.delete(MEMCACHE_FEATURED_KEY)
-                    
-        taskqueue.add(params={'speaker': data['speaker']}, url='/tasks/set_featured_speaker')
+        # featured = FEATURED_TPL.format(session.speaker, ','.join([session.name for session in sessions]))
+        featured = speaker
+        memcache.set(MEMCACHE_FEATURED_KEY, featured)
 
         return featured
 
