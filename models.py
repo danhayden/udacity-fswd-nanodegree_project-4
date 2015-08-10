@@ -124,7 +124,7 @@ class SessionForm(messages.Message):
     highlights    = messages.StringField(2, repeated=True)
     speaker       = messages.StringField(3)
     duration      = messages.IntegerField(4)
-    typeOfSession = messages.EnumField('TypeOfSession', 5)
+    typeOfSession = messages.StringField(5)
     date          = messages.StringField(6)
     startTime     = messages.StringField(7)
     websafeKey    = messages.StringField(8)
@@ -132,13 +132,6 @@ class SessionForm(messages.Message):
 class SessionForms(messages.Message):
     """SessionForms -- multiple Session outbound form message"""
     items = messages.MessageField(SessionForm, 1, repeated=True)
-
-class TypeOfSession(messages.Enum):
-    """TypeOfSession -- Session type enumeration value"""
-    NOT_SPECIFIED = 1
-    LECTURE = 2
-    KEYNOTE = 3
-    WORKSHOP = 4
 
 class WishlistSession(ndb.Model):
     """WishlistSession - conference session wishlist object"""

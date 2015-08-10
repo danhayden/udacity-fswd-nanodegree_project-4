@@ -597,9 +597,6 @@ class ConferenceApi(remote.Service):
                 # convert date and startTime to string;
                 if field.name == 'date' or field.name == 'startTime':
                     setattr(sf, field.name, str(getattr(session, field.name)))
-                # convert typeOfSession string to Enum
-                if field.name == 'typeOfSession':
-                    setattr(sf, field.name, getattr(typeOfSession, getattr(session, field.name)))
                 else:
                     setattr(sf, field.name, getattr(session, field.name))
             elif field.name == "websafeKey":
